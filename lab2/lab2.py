@@ -2,16 +2,16 @@ import enum
 import subprocess
 import re
 
-t_print = r'System\.out\.println$.*$' 
+t_print = r'System\.out\.println\(.*\)'
 t_class = r'\s*public class (?!MyClass)[A-Za-z]+'
-t_if = r'\s*if\(.+\){?'
+t_if = r'\s*if'
 t_def_main = r'\s*(public static void main(String[] args)|public class MyClass)'
 t_bracket_close = r'\s*}'
 t_bracket_open = r'\s*{'
 t_operation = r'\s*(== | != | >= | <= | \|\| | && | \+= | -= | \*= | = | [><!%\/])'
-t_else = r'\s*else\s*{?'
-t_special = r'\s*(public|private|protected|int|void|boolean|String|double|char)'
-t_var = r'\s*\b(?!(public|private|protected|int|void|boolean|String|double|char|class|if|else|this|return))[a-zA-Z0-9_]+\b'
+t_else = r'\s*(else|else if)\s*{?'
+t_special = r'\s*(public|private|protected|int|void|boolean|String|double|char|new)'
+t_var = r'\s*\b(?!(public|private|protected|int|void|boolean|String|double|char|class|if|else|this|return))[a-zA-Z][a-zA-Z0-9_]+\b'
 t_self = r'\s*this.'
 t_enter = r'\n'
 
@@ -69,11 +69,19 @@ def parse_var(text):
         return text
     elif re.search('\(',text) and match.group(0).replace('(','') not in def_names and match.group(0).replace('(','') not in class_names:
         text = text.replace(match.group(0),'def ' + match.group(0))
+        if (type[-1] == Type.CLASS):
+            text = text.replace('(','(self,')
         def_names.append(match.group(0))
         type.append(Type.DEF)
-    elif match.group(0).replace('(','') in class_names:
+    elif match.group(0).replace('(','') in class_names and type[-1] == Type.CLASS:
         text = text.replace(match.group(0),'def __init__')
+        if (type[-1] == Type.CLASS):
+            text = text.replace('(','(self,')
         type.append(Type.CONSTRUCTOR)
+    else:
+        var_names.append(match.group(0))
+        if (type[-1] == Type.CLASS):
+            text = text.replace(match.group(0),'self.'+match.group(0))
     text = text.replace('{',':')
     return text
     
@@ -104,6 +112,7 @@ def parse_else(text):
         return None
     type.append(Type.ELSE)
     text = text.replace('{',':')
+    text = text.replace('else if','elif')
     return text
 
 def parse_enter(text):
@@ -132,20 +141,20 @@ with open("C:\labs modern-programming\lab2\java.txt",'r') as file:
     for line in file:
         line = line.replace(';','')
         line = line.replace('\n','')
-        if parse_class(line) != None:
-            result.write(parse_class(line))
-        elif parse_if(line) != None:
-            result.write(parse_if(line))
-        elif parse_else(line) != None:
-            result.write(parse_else(line))
-        elif parse_print(line) != None:
-            result.write(parse_print(line))
+        if re.match(t_class,line) != None:
+            result.write(parse_class(line.strip()))
+        elif re.match(t_print,line) != None:
+            result.write(parse_print(line.strip()))
+        elif re.match(t_if, line) != None:
+            result.write(parse_if(line.strip()))
+        elif re.match(t_else, line) != None:
+            result.write(parse_else(line.strip()))
         else:
             list_line = line.split()
             for l in list_line:
-                if re.search(t_special,l) != None and parse_special(l) == None:
+                if (re.search(t_special,l) != None and parse_special(l) == None):
                     l = l.replace(re.search(t_special,l).group(0),'')
-                if parse_special(l) != None:
+                if parse_special(l) != None or l in class_names:
                     pass
                 elif re.match(t_bracket_open,l) != None or re.match(t_bracket_close,l) != None:
                     result.write(parse_brackets(l))
@@ -159,12 +168,12 @@ with open("C:\labs modern-programming\lab2\java.txt",'r') as file:
                     result.write(l + ' ')
         if parse_enter('\n') != None:
             result.write(parse_enter('\n'))
-        print(type)
 result.close()
 print(class_names)
 print(def_names)
+print(var_names)
 print(type)
-#output = subprocess.run(['python', 'result.py'], capture_output=True, text=True) #запуск команды для проигрывания кода из другого файла .py
+output = subprocess.run(['python', 'result.py'], capture_output=True, text=True) #запуск команды для проигрывания кода из другого файла .py
  
-#print(output.stdout)
+print(output.stdout)
 

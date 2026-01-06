@@ -11,5 +11,26 @@ public class Person {
     public int getAge(){
         return age;
     }
+    public String getAgeCategory() {
+        if (age < 0) {
+            return "Некорректный возраст";
+        } 
+        else if (age < 13) {
+            return "ребёнок";
+        } 
+        else if (age < 18) {
+            return "Подросток";
+        } 
+        else if (age < 60) {
+            return "Взрослый";
+        } 
+        else {
+            return "Пожилой";
+        }
+    }
 }
-
+public String get(){
+    return name;
+}
+Person p = new Person("Anna", 14);
+System.out.println(p.getAgeCategory());
