@@ -29,8 +29,50 @@ public class Person {
         }
     }
 }
-public String get(){
-    return name;
+
+public class Cat {
+    private String name = "";
+    public Person(String name){
+        this.name = name;
+    }
+    public String getName(){
+        return name;
+    }
 }
-Person p = new Person("Anna", 14);
-System.out.println(p.getAgeCategory());
+public class Dog {
+    private String name = "";
+    public Person(String name){
+        this.name = name;
+    }
+    public String getName(){
+        return name;
+    }
+}
+public class MyClass{ 
+
+    public String get(){
+    return name;
+    }
+    public static void main (String args[]){
+          
+        Person p = new Person("Anna", 24);
+        Person p2 = new Person("Vladimir",23);
+        System.out.println(p.getAgeCategory());
+        System.out.println("Hello, Person!");
+        if (p.name == "Anna" && p2.name == "Vladimir") {
+            System.out.println("Ее зовут Анна");
+            System.out.println("Его зовут Владимир");
+        }
+        if(p2.getAge() > p.getAge()){
+            System.out.println(p2.getName() + " старше " + p.getName());
+        }
+        else {
+            System.out.println(p2.getName() + " младше " + p.getName());
+        }
+        Cat cat = new Cat("Kitty");
+        System.out.println("Cat'name - " + cat.getName());
+        cat.name = "Lili";
+        System.out.println("Cat'name - " + cat.getName());
+
+    }
+}
