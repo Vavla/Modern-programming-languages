@@ -6,12 +6,12 @@ import psycopg2
 def deserialization(serialized): #полученные из топика данные десериализуем (байты -> начальный формат)
     return json.loads(serialized.decode('utf-8'))
 
-def validate_table_name(table_name):
+def validate_table_name(table_name): #работает - проверено
     if table_name == None:
         return False
     return True
 
-def validate_data(list_data):
+def validate_data(list_data): #работает - проверено
     if list_data == None:
         print('Validation: error: empty data')
         return False
@@ -31,7 +31,8 @@ def exist_table(table_name, cursor):
         print('table dont exist')
         return False
 
-def type_field(rows,columns):
+def type_field(rows,columns): #работает - проверено
+    type_list = []
     for i in range(1, len(columns)):
         status = 'INTEGER'
         for j in range(0, len(rows)):
@@ -40,11 +41,20 @@ def type_field(rows,columns):
                 break
             elif (type(rows[j][i]) is float):
                 status = 'DOUBLE'
-        print(status)
+        type_list.append(status)
+    return type_list
 
 
-def create_table(table_name,columns):
-    cursor.execute("CREATE TABLE people (id SERIAL PRIMARY KEY, name VARCHAR(50),  age INTEGER)")
+def create_table(table_name,columns,types):
+    sql = f'CREATE TABLE {table_name} (id SERIAL PRIMARY KEY'
+    k = 0
+    for i in columns:
+        if not (i == 'id'):
+            sql += f', {i} {types[k]}'
+            k += 1
+    sql += ');'
+   # print(sql)
+    cursor.execute(sql)
 
 
 def event_listening(data):
@@ -96,6 +106,7 @@ if __name__ == '__main__':
     print(validate_table_name(None))
     print(validate_data(3))
     print(validate_data([3]))
+    create_table('openn', ['id','count','size'],type_field([[1,2,2.0],[2,2,1],[3,5,12.9]],['id','count','size']))
     #consume()
     #cursor.close()  # закрываем курсор
     #connector.close()
