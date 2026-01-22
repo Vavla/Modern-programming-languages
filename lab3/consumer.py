@@ -1,6 +1,7 @@
-from kafra import KafkaConsumer
+from kafka import KafkaConsumer
 import json
 import config
+import psycopg2
 
 def deserialization(serialized): #полученные из топика данные десериализуем (байты -> начальный формат)
     return json.loads(serialized.decode('utf-8'))
@@ -28,7 +29,7 @@ def event_listening(data):
     
     pass
 
-async def consume():
+def consume():
     try:
         consumer = KafkaConsumer(config.TABLE_TOPIC, 
         bootstrap_servers = [f'{config.HOST}:{config.PORT}'],
