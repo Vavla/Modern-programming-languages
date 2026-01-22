@@ -1,11 +1,31 @@
-from kafka import KafkaConsumer
+from kafra import KafkaConsumer
 import json
 import config
 
 def deserialization(serialized): #полученные из топика данные десериализуем (байты -> начальный формат)
     return json.loads(serialized.decode('utf-8'))
 
+def validate_table_name(table_name):
+    if table_name == None:
+        return False
+    return True
+
+def validate_data(list_data):
+    if list_data == None:
+        print('Validation: error: empty data')
+        return False
+    elif not (type(list_data) is list and len(list_data) > 0):
+        print('Validation: error')
+        return False
+    return True
+
 def event_listening(data):
+    table_name = data['table_name']
+    columns = data['columns']
+    rows = data['rows']
+    if  validate_table_name(table_name) and validate_data(columns) and validate_data(rows):
+        print('Data is consistent')
+    
     pass
 
 async def consume():
@@ -36,4 +56,8 @@ async def consume():
         consumer.close()
 
 if __name__ == '__main__':
-    consume()
+    print(validate_data(None))
+    print(validate_table_name(None))
+    print(validate_data(3))
+    print(validate_data([3]))
+    #consume()
