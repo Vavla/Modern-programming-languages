@@ -54,8 +54,24 @@ def create_table(table_name,columns,types):
             k += 1
     sql += ');'
    # print(sql)
-    cursor.execute(sql)
-
+    #cursor.execute(sql)
+    
+def insert_data(table_name, columns, row,type_list):
+    sql = f"INSERT INTO {table_name} ("
+    k = 0
+    for i in columns:
+        if not (i == 'id'):
+            sql += f'{i}, '
+    sql = sql[:-2]
+    sql += ") VALUES ("
+    for i in range(1,len(row)):
+        if type_list[i-1] == 'VARCHAR(255)':
+            sql += f"'{row[i]}', "
+        else:
+            sql += f"{row[i]}, "
+    sql = sql[:-2] + ');'
+    print(sql)
+    #cursor.execute(sql)
 
 def event_listening(data):
     table_name = data['table_name']
@@ -65,10 +81,10 @@ def event_listening(data):
         print('Data is consistent')
     if not exist_table(table_name,cursor):
         create_table(table_name)
-        insert_data(columns, rows)
+       # insert_data(columns, row)
     else:
-        insert_data(columns, rows)
-    pass
+       # insert_data(columns, row)
+       pass
 
 def consume():
     try:
@@ -84,8 +100,8 @@ def consume():
                     print(f"  Данные: {data}")
                     print("-" * 50)
                     
-                    event_listening(data)
-                    
+                    event_listening(data) 
+
             except json.JSONDecodeError as e:
                     print(f"Ошибка десериализации: {e}")
             except Exception as e:
@@ -107,6 +123,7 @@ if __name__ == '__main__':
     print(validate_data(3))
     print(validate_data([3]))
     create_table('openn', ['id','count','size'],type_field([[1,2,2.0],[2,2,1],[3,5,12.9]],['id','count','size']))
+    insert_data('openn', ['id','count','size'], [1,2,2.0], type_field([[1,2,2.0],[2,2,1],[3,5,12.9]],['id','count','size']))
     #consume()
     #cursor.close()  # закрываем курсор
     #connector.close()
