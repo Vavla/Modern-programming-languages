@@ -76,5 +76,15 @@ if __name__ == "__main__":
     
     final_search_median()
 
-    
+
+#def use_pandas(f):
+    #df = pd.read_csv(f,",")
+    #print(df[[country,count]])
+    #df.dropna(subset="") - указали конкретный столбец, теперь прога убирает сразу строки, где в этом столбце пусто NULL
+    #df.sum() - 
+    #df.merge(df2, how = "Inner",on=[ID])
+    # on - когда общий столбец, по кот. пересекаем таблицы, для всех одинаков по названию, а left_on/right_on - ключи называются по-разному в разных таблицах
+    # для фильтрации нужно df.loc[(df["age"] > 35) & (df["country"] = "H")] -> получим нужные нам строки
+    # series - 1мерный dataframe - многомерный
+
 
