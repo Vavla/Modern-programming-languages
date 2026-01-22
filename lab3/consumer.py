@@ -81,9 +81,11 @@ def event_listening(data):
         print('Data is consistent')
     if not exist_table(table_name,cursor):
         create_table(table_name)
-       # insert_data(columns, row)
+        for i in rows:
+            insert_data(columns, i)
     else:
-       # insert_data(columns, row)
+       for i in rows:
+            insert_data(columns, i)
        pass
 
 def consume():
