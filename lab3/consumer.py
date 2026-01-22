@@ -20,13 +20,44 @@ def validate_data(list_data):
         return False
     return True
 
+def db_connect():
+    return psycopg2.connect(dbname=config.DB_DATABASE, host=config.DB_HOST, user=config.DB_USER, password=config.DB_PASSWORD, port=config.DB_PORT)
+
+def exist_table(table_name, cursor):
+    cursor.execute(f'SELECT * FROM {config.DB_DATABASE}.TABLES WHERE TABLE_NAME = {table_name};')
+    if(cursor.fetchall()):
+        return True
+    else:
+        print('table dont exist')
+        return False
+
+def type_field(rows,columns):
+    for i in range(1, len(columns)):
+        status = 'INTEGER'
+        for j in range(0, len(rows)):
+            if(type(rows[j][i]) is str):
+                status = 'VARCHAR(255)'
+                break
+            elif (type(rows[j][i]) is float):
+                status = 'DOUBLE'
+        print(status)
+
+
+def create_table(table_name,columns):
+    cursor.execute("CREATE TABLE people (id SERIAL PRIMARY KEY, name VARCHAR(50),  age INTEGER)")
+
+
 def event_listening(data):
     table_name = data['table_name']
     columns = data['columns']
     rows = data['rows']
     if  validate_table_name(table_name) and validate_data(columns) and validate_data(rows):
         print('Data is consistent')
-    
+    if not exist_table(table_name,cursor):
+        create_table(table_name)
+        insert_data(columns, rows)
+    else:
+        insert_data(columns, rows)
     pass
 
 def consume():
@@ -57,8 +88,14 @@ def consume():
         consumer.close()
 
 if __name__ == '__main__':
+    #connector = db_connect()
+    #cursor = connector.cursor()
+    #connector.autocommit = True
+    type_field([[1,2,4],[2,6.0,8]],['id','o','a'])
     print(validate_data(None))
     print(validate_table_name(None))
     print(validate_data(3))
     print(validate_data([3]))
     #consume()
+    #cursor.close()  # закрываем курсор
+    #connector.close()
